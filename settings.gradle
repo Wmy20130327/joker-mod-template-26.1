@@ -1,15 +1,17 @@
 pluginManagement {
-    repositories {
-        maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
-        maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/maven-public/' }
-        gradlePluginPortal()
-    }
+	repositories {
+		// Loom 插件只发布在 Fabric 官方 maven（含 SNAPSHOT）。
+		// Gradle Plugin Portal / 阿里云 gradle-plugin 镜像上 net.fabricmc:fabric-loom
+		// 存在陈旧的同名元数据（0.3.1-SNAPSHOT.local），必须把 fabric maven 放在第一位，
+		// 否则插件解析会被镜像的错误元数据带偏，报 "Plugin ... was not found"。
+		maven { url 'https://maven.fabricmc.net/' }
+		// 国内镜像加速（仅作为兜底，不要放在 fabric maven 前面）
+		maven { url 'https://maven.aliyun.com/repository/public' }
+		maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/maven-public/' }
+		gradlePluginPortal()
+	}
 }
 
-dependencyResolutionManagement {
-    repositories {
-        maven { url 'https://maven.aliyun.com/repository/public' }
-        maven { url 'https://mirrors.cloud.tencent.com/nexus/repository/maven-public/' }
-        mavenCentral()
-    }
-}
+// 注意：不要再写 dependencyResolutionManagement.repositories 来统一管理仓库，
+// 它会强制覆盖 build.gradle 中的 repositories，导致 Loom 拿不到
+// Mojang 官方源（libraries.minecraft.net / piston-meta 等）而无法初始化。
